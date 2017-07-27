@@ -1,0 +1,13 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# 创建的文件:25.10.2016 11:54:27
+
+#
+# object b1
+#
+v  16.0542 12.1619 -2.4442
+v  20.0 0.0 0.0
+v  0.0 0.0 0.0
+
+g b1
+s 1
+f 1 2 3

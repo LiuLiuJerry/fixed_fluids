@@ -1,0 +1,25 @@
+Example scenes are loaded from the scene.xml file
+All parameters are permitted in either Fluid or Scene sections. 
+DT            Simulation time step 
+SimScale      Simulation scale (see website) 
+Viscosity     Fluid viscosity coefficient 
+RestDensity   Fluid rest density 
+Mass          Fluid particle mass 
+Radius        Fluid particle radius, only for boundary tests 
+IntStiff      Fluid internal stiffness (non-boundary) 
+BoundStiff    Fluid stiffness at boundary 
+BoundDamp     Fluid damping at boundary 
+AccelLimit    Acceleration limit (for stability) 
+VelLimit      Velocity limit (for stability) 
+PointGravAmt  Strength of point gravity 
+PointGravPos  Position of point gravity 
+PlaneGravDir  Direction of plane gravity 
+GroundSlope   Slope of the ground (Y- plane) 
+WaveForceFre  Frequency of wave forcing WaveForceMin Amplitude of wave forcing from X- plane 
+WaveForceMax  Amplitude of wave forcing from X+ plane 
+Name          Name of scene example 
+Num           Number of particles to simulate 
+VolMin        Start corner of Domain Volume 
+VolMax        End corner of Domain Volume 
+InitMin       Start corner of Initial Particle placement 
+InitMax       End corner of Initial Particle placement

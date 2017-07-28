@@ -51,6 +51,7 @@
 //////////////My add///////////////////////////////////////////////////////////////
 #include "../OBJLoading/AccessObj.h"
 
+
 CAccessObj obj;
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -168,6 +169,10 @@ void FluidSystem::Setup ( bool bStart )
 	FluidParamCUDA ( m_Param[PSIMSCALE], m_Param[PSMOOTHRADIUS], m_Param[PRADIUS], m_Param[PMASS], m_Param[PRESTDENSITY], *(float3*)& m_Vec[PBOUNDMIN], *(float3*)& m_Vec[PBOUNDMAX], m_Param[PEXTSTIFF], m_Param[PINTSTIFF], m_Param[PVISC], m_Param[PEXTDAMP], m_Param[PFORCE_MIN], m_Param[PFORCE_MAX], m_Param[PFORCE_FREQ], m_Param[PGROUND_SLOPE], grav.x, grav.y, grav.z, m_Param[PACCEL_LIMIT], m_Param[PVEL_LIMIT] );
 
 	TransferToCUDA ();		*/// Initial transfer
+
+	//Marching Cubes
+	initMarcher();
+
 	#endif
 
 
@@ -175,14 +180,14 @@ void FluidSystem::Setup ( bool bStart )
 	obj.setBoundingbox(m_GridMax, m_GridMin );
 	obj.setCellSize(m_Param[PGRIDSIZE]/m_Param[PSIMSCALE], m_GridDelta);
 	obj.LoadOBJ("branchnew.obj"/*, m_Vec[PVOLMAX].x, m_Vec[PVOLMAX].y, m_Vec[PVOLMAX].z, m_Vec[PVOLMIN].x, m_Vec[PVOLMIN].y, m_Vec[PVOLMIN].z*/);
-	
+	//obj.LoadOBJ("sphere.obj");
 /////////////////////////////////////////////////////////////
 }
 
 void FluidSystem::SetParam (int p, float v )
 {
 	// Update CPU
-	m_Param[p] = v;
+	m_Param[p] = v; 
 	// Update GPU
 	Vector3DF grav = m_Vec[PPLANE_GRAV_DIR];
 	FluidParamCUDA ( m_Param[PSIMSCALE], m_Param[PSMOOTHRADIUS], m_Param[PRADIUS], m_Param[PMASS], m_Param[PRESTDENSITY], *(float3*)& m_Vec[PBOUNDMIN], *(float3*)& m_Vec[PBOUNDMAX], m_Param[PEXTSTIFF], m_Param[PINTSTIFF], m_Param[PVISC], m_Param[PEXTDAMP], m_Param[PFORCE_MIN], m_Param[PFORCE_MAX], m_Param[PFORCE_FREQ], m_Param[PGROUND_SLOPE], grav.x, grav.y, grav.z, m_Param[PACCEL_LIMIT], m_Param[PVEL_LIMIT] );
@@ -398,8 +403,8 @@ void FluidSystem::AddEmit ( float spacing )
 	int initSize = 10;
 	randPos.x -= initSize;
 	randPos.z -= initSize;
-	randPos.x += rand()%initSize;
-	randPos.z += rand()%initSize;
+	randPos.x += 6/*rand()%initSize*/;
+	randPos.z += 6/*rand()%initSize*/;
 
 	for ( int y = 0; y < x; y++ ) {	
 		for (int xz=0; xz < cnt; xz++ ) {
@@ -557,6 +562,7 @@ void FluidSystem::RunSimulateCPUGrid ()
 	Advance ();
 	PERF_POP ();
 	record ( PTIME_ADVANCE, "Advance CPU", start );
+	if(use_marching_cube) coutourParticles();
 }
 
 void FluidSystem::RunSimulateCUDARadix ()
@@ -955,10 +961,10 @@ void FluidSystem::Advance ()
 		// Y-axis walls
 		diff = radius - ( ppos->y - (bmin.y+ (ppos->x-bmin.x)*m_Param[PGROUND_SLOPE] ) )*ss;
 		if (diff > EPSILON ) {	
-
-			//norm.Set ( -m_Param[PGROUND_SLOPE], 1.0 - m_Param[PGROUND_SLOPE], 0 );
-			//adj = stiff * diff - damp * norm.Dot ( *pveleval );
-			//accel.x += adj * norm.x; accel.y += adj * norm.y; accel.z += adj * norm.z;
+			*pvel = Vector3DF(0, 0, 0);
+			norm.Set ( -m_Param[PGROUND_SLOPE], 1.0 - m_Param[PGROUND_SLOPE], 0 );
+			adj = stiff * diff - damp * norm.Dot ( *pveleval );
+			accel.x += adj * norm.x; accel.y += adj * norm.y; accel.z += adj * norm.z;
 		}		
 		diff = radius - ( bmax.y - ppos->y )*ss;
 		if (diff > EPSILON) {
@@ -2072,7 +2078,19 @@ void FluidSystem::Draw ( Camera3D& cam, float rad )
 	};
 
 	//////////my add///////////////////////////
-	obj.Draw();
+	//obj.Draw();
+	obj.DrawSmooth();
+	if(use_marching_cube){
+		//marcher->draw_mesh();
+		char num[10];
+		itoa(m_Frame, num, 10);
+		char file[30] = "pov/liquid";
+		strcat(file, num);
+		//strcat(file, ".obj");
+		//marcher->get_mesh()->dumpObj(file);
+		strcat(file, ".pov");
+		marcher->get_mesh()->dumpPovray(file);
+	}
 	///////////////////////////////////////////
 
 	// Draw Modes
@@ -2843,34 +2861,34 @@ void FluidSystem::CaptureVideo (int width, int height)
     FILE *fScreenshot;
 	char fileName[64];
     
-    sprintf( fileName, "screen_%04d.bmp", m_Frame );
-    
-    fScreenshot = fopen( fileName, "wb");
-												// record frame buffer directly to image pixels
-    //glReadPixels( 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, mImg.getData() );	
-  
-	//mImg.SavePng ( fScreenshot );				// write bmp format
+ //   sprintf( fileName, "screen_%04d.bmp", m_Frame );
+ //   
+ //   fScreenshot = fopen( fileName, "wb");
+	//											// record frame buffer directly to image pixels
+ //   //glReadPixels( 0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, mImg.getData() );	
+ // 
+	////mImg.SavePng ( fScreenshot );				// write bmp format
 
-	fflush ( fScreenshot );						// close file
-	fclose ( fScreenshot );
+	//fflush ( fScreenshot );						// close file
+	//fclose ( fScreenshot );
 
-    //convert to BGR format    
-    /*unsigned char temp;
-    int i = 0;
-    while (i < nSize) {
-        temp = pixels[i];       //grab blue
-        pixels[i] = pixels[i+2];//assign red to blue
-        pixels[i+2] = temp;     //assign blue to red
-        i += 3;     //skip to next blue byte
-    }*/
-	// TGA format
-    /*unsigned char TGAheader[12]={0,0,2,0,0,0,0,0,0,0,0,0};
-    unsigned char header[6] = {m_WindowWidth%256,m_WindowWidth/256,
-    m_WindowHeight%256,m_WindowHeight/256,24,0};    
-    fwrite(TGAheader, sizeof(unsigned char), 12, fScreenshot);
-    fwrite(header, sizeof(unsigned char), 6, fScreenshot);
-    fwrite(pixels, sizeof(GLubyte), nSize, fScreenshot);
-    fclose(fScreenshot);*/
+ //   //convert to BGR format    
+ //   unsigned char temp;
+ //   int i = 0;
+ //   while (i < nSize) {
+ //       temp = pixels[i];       //grab blue
+ //       pixels[i] = pixels[i+2];//assign red to blue
+ //       pixels[i+2] = temp;     //assign blue to red
+ //       i += 3;     //skip to next blue byte
+ //   }
+	//// TGA format
+ //   unsigned char TGAheader[12]={0,0,2,0,0,0,0,0,0,0,0,0};
+ //   unsigned char header[6] = {m_WindowWidth%256,m_WindowWidth/256,
+ //   m_WindowHeight%256,m_WindowHeight/256,24,0};    
+ //   fwrite(TGAheader, sizeof(unsigned char), 12, fScreenshot);
+ //   fwrite(header, sizeof(unsigned char), 6, fScreenshot);
+ //   fwrite(pixels, sizeof(GLubyte), nSize, fScreenshot);
+ //   fclose(fScreenshot);
     
     return;
 }
@@ -3202,3 +3220,67 @@ void FluidSystem::ComputeWoodForce(){
 	}
 
 } 
+
+void FluidSystem::initMarcher(){
+	phi_dx = m_Param[PGRIDSIZE]/m_Param[PSIMSCALE];
+	isoValue = 0.5;
+	phi.resize(m_GridRes.z, m_GridRes.x, m_GridRes.y);
+	//这里是一个引用，把密度phi直接连接到MarchingCubes
+	marcher = new MarchingCubes(Vec3r(0.5*phi_dx,0.5*phi_dx,0.5*phi_dx),phi_dx,phi);
+	use_marching_cube = true;
+}
+
+void FluidSystem::coutourParticles(){
+	// compute density for each sampling points
+	phi.assign(0);
+
+	int		j,gs;
+	float	d = m_Param[PSIMSCALE];
+	float	d2 = d*d;
+	Vector3DF dst;
+	float	dsq, c, sum;
+	int		nadj = (m_GridRes.z + 1)*m_GridRes.x + 1;
+	int*	jnext;
+
+	int nbrcnt = 0;
+	int srch = 0;
+
+	for(int n = 0; n < m_GridTotal; n++){
+		Vector3DI p = getCell(n);
+		int x, y, z;
+		x = p.x; y = p.y; z = p.z;
+		Vector3DF pos(m_GridMin.x+(x+0.5)*phi_dx,  m_GridMin.y+(y+0.5)*phi_dx,  m_GridMin.z+(z+0.5)*phi_dx);
+
+		sum = 0;
+		for (int cell=0; cell < m_GridAdjCnt; cell++) {
+			gs =  n - nadj + m_GridAdj[cell];
+			if( gs<0 || gs >= m_GridTotal) continue;
+			j = m_Grid [gs];
+			while ( j != GRID_UNDEF ) {
+				dst = *(mPos + j);
+				dst -= pos;
+				dsq = d2*(dst.x*dst.x + dst.y*dst.y + dst.z*dst.z);
+				if ( dsq <= m_R2 ) {
+					c =  m_R2 - dsq;
+					sum += c * c * c;
+					nbrcnt++;
+				}
+				srch++;
+				j = *(mGridNext+j) ;
+			}
+		}
+		sum *= m_Param[PMASS]* m_Poly6Kern;
+		sum /= m_Param[PRESTDENSITY];
+		phi(z, x, y) += sum ;
+	}
+
+	/*for(int i = 0; i < m_GridRes.z; i++)
+		for(int j = 0; j < m_GridRes.x; j++)
+			for(int k = 0; k < m_GridRes.y; k++){
+				float num = phi(i, j, k);
+				if( num != 0.0)
+					printf("%d %d %d : %f", i, j, k,num);
+			}*/
+	
+	marcher->contour_grid(isoValue);
+}

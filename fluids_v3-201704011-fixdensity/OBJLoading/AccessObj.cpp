@@ -708,7 +708,7 @@ float CAccessObj::Unitize()
 	
 	/* calculate center of the m_pModel */
 	cx = (maxx + minx) / 2.0f;
-	cy = 0/*(maxy + miny) / 2.0f*/;
+	cy = -5/*(maxy + miny) / 2.0f*/;
 	cz = (maxz + minz) / 2.0f;
 	
 	/* calculate unitizing scale factor */
@@ -1256,6 +1256,7 @@ void CAccessObj::LoadOBJ(/*CString*/ char*  filename/*, float minx, float miny, 
 
 ////////////My add//////////////////////////////////////////////////
 	FacetNormals();
+	VertexNormals(90);
 ////////////////////////////////////////////////////////////////////
 
 	//CalcBoundingBox();
@@ -1516,7 +1517,7 @@ void CAccessObj::Draw()
 		{
 			triangle = &T(group->pTriangles[i]);
 			
-		glBegin(GL_LINE_LOOP);
+		glBegin(/*GL_LINE_LOOP*/GL_TRIANGLES);
 			glVertex3f(m_pModel->vpVertices[triangle->VertIdx[0]].x,
 				m_pModel->vpVertices[triangle->VertIdx[0]].y,
 				m_pModel->vpVertices[triangle->VertIdx[0]].z);
@@ -1535,6 +1536,62 @@ void CAccessObj::Draw()
 	}
 
 	
+}
+void CAccessObj::DrawSmooth(){
+	static unsigned int i;
+	static COBJgroup* group;
+	static COBJtriangle* triangle;
+	static COBJmaterial* material;
+
+	if (m_pModel == NULL) return;
+	//DrawGrid();
+	group = m_pModel->pGroups;
+	glPushMatrix();
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+
+	float diff[4] = {0.0, 0.8, 0, 1};
+	glMaterialfv(GL_FRONT,GL_DIFFUSE,diff); 
+	glColor3f(0.0f, 1.0f, 0.3f);
+	while (group)
+	{
+		for (i = 0; i < group->nTriangles; i++)
+		{
+			triangle = &T(group->pTriangles[i]);
+
+			glBegin(/*GL_LINE_LOOP*/GL_TRIANGLES);
+			//glNormal3f(m_pModel->vpFacetNorms[triangle->findex].x, m_pModel->vpFacetNorms[triangle->findex].y, m_pModel->vpFacetNorms[triangle->findex].z);
+			
+			glNormal3f(m_pModel->vpNormals[triangle->NormIdx[0]].x, 
+				m_pModel->vpNormals[triangle->NormIdx[0]].y,
+				m_pModel->vpNormals[triangle->NormIdx[0]].z);
+			glVertex3f(m_pModel->vpVertices[triangle->VertIdx[0]].x,
+				m_pModel->vpVertices[triangle->VertIdx[0]].y,
+				m_pModel->vpVertices[triangle->VertIdx[0]].z);
+
+			glNormal3f(m_pModel->vpNormals[triangle->NormIdx[1]].x, 
+				m_pModel->vpNormals[triangle->NormIdx[1]].y,
+				m_pModel->vpNormals[triangle->NormIdx[1]].z);
+			glVertex3f(m_pModel->vpVertices[triangle->VertIdx[1]].x,
+				m_pModel->vpVertices[triangle->VertIdx[1]].y,
+				m_pModel->vpVertices[triangle->VertIdx[1]].z);
+
+			glNormal3f(m_pModel->vpNormals[triangle->NormIdx[2]].x, 
+				m_pModel->vpNormals[triangle->NormIdx[2]].y,
+				m_pModel->vpNormals[triangle->NormIdx[2]].z);
+			glVertex3f(m_pModel->vpVertices[triangle->VertIdx[2]].x,
+				m_pModel->vpVertices[triangle->VertIdx[2]].y,
+				m_pModel->vpVertices[triangle->VertIdx[2]].z);
+			glEnd();
+		}
+
+		group = group->next;
+	}
+	glDisable(GL_LIGHT0);
+	glDisable(GL_LIGHT1);
+	glDisable(GL_LIGHTING);
+	glPopMatrix();
 }
 
 void CAccessObj::DrawGrid(){

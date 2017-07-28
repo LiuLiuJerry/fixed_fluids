@@ -20,9 +20,9 @@
 <Scene id="1">
 	<Name>		Large Ocean Waves </Name>
 	<Num>		2048		</Num>
-	<VolMin>	-110, -100, -110 </VolMin>
+	<VolMin>	-110, -50, -110 </VolMin>
 	<VolMax> 	110, 300, 110	</VolMax>
-	<InitMin>	-10, 100, -10	</InitMin>
+	<InitMin>	-10, 50, -10	</InitMin>
 	<InitMax> 	5, 300, 5	</InitMax>
 	<WaveForceFreq>	0		</WaveForceFreq>
 	<WaveForceMin>	0		</WaveForceMin>

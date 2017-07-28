@@ -16,6 +16,21 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="OBJLoading\AccessObj.cpp" />
+    <ClCompile Include="marching\marching_cubes.cpp">
+      <Filter>marcher</Filter>
+    </ClCompile>
+    <ClCompile Include="marching\priorityqueue.cpp">
+      <Filter>marcher</Filter>
+    </ClCompile>
+    <ClCompile Include="marching\timer.cpp">
+      <Filter>marcher</Filter>
+    </ClCompile>
+    <ClCompile Include="marching\trimesh.cpp">
+      <Filter>marcher</Filter>
+    </ClCompile>
+    <ClCompile Include="marching\openglutils.cpp">
+      <Filter>marcher</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="fluids\fluid_defs.h" />
@@ -49,6 +64,48 @@
     </ClInclude>
     <ClInclude Include="OBJLoading\AccessObj.h" />
     <ClInclude Include="OBJLoading\Math.h" />
+    <ClInclude Include="marching\marching_cubes.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\array3.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\vec.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\array1.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\array2.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\array2_utils.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\array3_utils.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\marching_cubes_lookup_table.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\priorityqueue.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\timer.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\trimesh.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\types.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\util.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
+    <ClInclude Include="marching\openglutils.h">
+      <Filter>marcher</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="fluids\fluid_system_host.cu" />
@@ -68,6 +125,9 @@
     </Filter>
     <Filter Include="common">
       <UniqueIdentifier>{c2497ce4-bcf7-4c13-b63d-7b9ec69e44ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="marcher">
+      <UniqueIdentifier>{849e7f03-e492-4e64-abfc-5b706f63f1aa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

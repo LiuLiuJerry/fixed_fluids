@@ -125,6 +125,7 @@ void drawScene ( float* viewmat, bool bShade )
 	
 		glEnable ( GL_LIGHTING );
 		glEnable ( GL_LIGHT0 );
+		glEnable(GL_LIGHT1);
 		glDisable ( GL_COLOR_MATERIAL );
 
 		Vector4DF amb, diff, spec;
@@ -140,10 +141,11 @@ void drawScene ( float* viewmat, bool bShade )
 		pos[2] = light[0].z;
 		pos[3] = 1;
 		amb.Set ( 0,0,0,1 ); diff.Set ( 1,1,1,1 ); spec.Set(1,1,1,1);
-		glLightfv ( GL_LIGHT0, GL_POSITION, (float*) &pos[0]);
-		glLightfv ( GL_LIGHT0, GL_AMBIENT, (float*) &amb.x );
-		glLightfv ( GL_LIGHT0, GL_DIFFUSE, (float*) &diff.x );
-		glLightfv ( GL_LIGHT0, GL_SPECULAR, (float*) &spec.x ); 
+		glLightfv ( GL_LIGHT1, GL_POSITION, (float*) &pos[0]);
+		glLightfv ( GL_LIGHT1, GL_AMBIENT, (float*) &amb.x );
+		glLightfv ( GL_LIGHT1, GL_DIFFUSE, (float*) &diff.x );
+		glLightfv ( GL_LIGHT1, GL_SPECULAR, (float*) &spec.x ); 
+		glLightf(GL_LIGHT1,GL_LINEAR_ATTENUATION,0.8);
 		
 		amb.Set ( 0,0,0,1 ); diff.Set ( .3, .3, .3, 1); spec.Set (.1,.1,.1,1);
 		glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, (float*) &amb.x );
@@ -306,7 +308,7 @@ void display ()
 
 	//if ( psys.GetToggle(PPROFILE) ) { rstop.SetSystemTime ( ACC_NSEC ); rstop = rstop - rstart; printf ( "RENDER: %s\n", rstop.GetReadableTime().c_str() ); }
 ///////////////////////////////////////////////////////
-	//if ( bHelp ) drawGui ();
+	if ( bHelp ) drawGui ();
 
 	//draw2D ();
 
@@ -579,13 +581,23 @@ void init ()
 	cam.setFov ( 35 );
 	cam.updateMatricies ();
 	
-	light[0].x = 0;		light[0].y = 200;	light[0].z = 0; light[0].w = 1;
+	light[0].x = 50;		light[0].y = 100;	light[0].z = -50; light[0].w = 1;
 	light_to[0].x = 0;	light_to[0].y = 0;	light_to[0].z = 0; light_to[0].w = 1;
 
 	light[1].x = 55;		light[1].y = 140;	light[1].z = 50;	light[1].w = 1;
 	light_to[1].x = 0;	light_to[1].y = 0;	light_to[1].z = 0;		light_to[1].w = 1;
 
 	light_fov = 45;
+	//init light
+	//GLfloat light_position[] = { 50.0, 200.0, 50.0, 1.0 };
+	//GLfloat light_ambient [] = { 0.0, 0.0, 0.0, 1.0 };
+	//GLfloat light_diffuse [] = { 1.0, 1.0, 1.0, 1.0 };
+	//GLfloat light_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	//glLightfv(GL_LIGHT0,GL_POSITION,light_position); 
+	//glLightfv(GL_LIGHT0,GL_AMBIENT,light_ambient);
+	//glLightfv(GL_LIGHT0,GL_DIFFUSE,light_diffuse);
+	//glLightfv(GL_LIGHT0,GL_SPECULAR,light_specular);
+	//glLightf(GL_LIGHT0,GL_CONSTANT_ATTENUATION,1);
 
 	obj_from.x = 0;		obj_from.y = 0;		obj_from.z = 20;		// emitter
 	obj_angs.x = 118.7;	obj_angs.y = 200;	obj_angs.z = 1.0;

@@ -339,6 +339,7 @@ public:
 
 	void LoadOBJ(/*CString*/ char* filename/*, float minx, float miny, float minz, float maxx, float maxy, float maxz*/);
 	void Draw();
+	void DrawSmooth();
 	void DrawGrid();
 	void setBoundingbox(Vector3DF max, Vector3DF min){ m_vMax = max; m_vMin = min; };
 	void setCellSize(float size, Vector3DF delta){ CellSize = size;  gridDelta = delta; };

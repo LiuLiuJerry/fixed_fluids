@@ -51,6 +51,8 @@
 
 	#include "xml_settings.h"
 
+	#include "../marching/marching_cubes.h"
+
 
 
 	#define MAX_PARAM			50   //50
@@ -227,6 +229,10 @@
 		void RunSimulateCUDAFull ();
 		void RunSimulateCUDACluster ();
 		void RunPlayback ();
+
+		// Marching Cubes
+		void initMarcher();
+		void coutourParticles();
 		
 		void Advance ();
 		void EmitParticles ();
@@ -349,12 +355,21 @@
 		int*                    mphase;
 		Vector3DF*              mSurfaceTension;
 		float*                  mheat;
+
+		//Marching Cubes
+		// marching cube...
+		MarchingCubes *marcher;		// to abstract surface
+		float isoValue;				// value for isosurface
+		Array3r phi;				// density field from particles...
+		//int	phi_nx;				// number of grid in each dimension
+		float phi_dx;				// size of a cell
+		bool use_marching_cube;		// false...
 		
 		// Acceleration Grid
 		uint*					m_Grid;
 		uint*					m_GridCnt;
 		int						m_GridTotal;			// total # cells
-		Vector3DI				m_GridRes;				// resolution in each axis
+		Vector3DI				m_GridRes;				// resolution in each axis,每个维度都有多少个网格
 		Vector3DF				m_GridMin;				// volume of grid (may not match domain volume exactly)
 		Vector3DF				m_GridMax;		
 		Vector3DF				m_GridSize;				// physical size in each axis

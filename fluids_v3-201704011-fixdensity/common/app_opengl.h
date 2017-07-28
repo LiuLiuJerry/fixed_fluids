@@ -51,7 +51,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <GL/gl.h>
+//#include <GL/gl.h>
 
 extern void display ();
 extern void keyboard_func (unsigned char, int, int);
